@@ -55,6 +55,12 @@ class HomescreenActivity : AppCompatActivity() {
             performLogout()
         }
 
+        val reportLogo = findViewById<ImageView>(R.id.ReportLogo)
+        reportLogo.setOnClickListener {
+            val intent = Intent(this, ReportActivity::class.java)
+            startActivity(intent)
+        }
+
         showData()
     }
 

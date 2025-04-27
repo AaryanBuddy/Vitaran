@@ -31,6 +31,7 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/ReportTotalCount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/ReportHeader"
@@ -43,7 +44,7 @@
         android:elevation="10dp">
 
         <TextView
-            android:id="@+id/ReportTotalCount"
+            android:id="@+id/TextTotalCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Total Count"
@@ -54,12 +55,15 @@
 
     </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent">
-
-
-
-    </RelativeLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/RecyclerView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ReportTotalCount"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="30dp"
+        tools:listitem="@layout/activity_report_item"/>
 
 </RelativeLayout>

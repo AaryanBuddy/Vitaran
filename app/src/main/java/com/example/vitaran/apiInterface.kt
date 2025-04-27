@@ -12,4 +12,8 @@ interface apiInterface {
 
     @POST("Guard/AssignRoutes")
     fun report(@Body reportRequest: ReportRequest): Call<ReportResponseData>
+
+    @POST("Guard/GuardActionHistory")
+    fun route(@Body reportRequest: ReportRequest): Call<RouteResponse>
+
 }

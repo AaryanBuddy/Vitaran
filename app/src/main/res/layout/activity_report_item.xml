@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/plain_background"
+        android:padding="20dp"
+        android:elevation="20dp">
+
+        <TextView
+            android:id="@+id/DD_No"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DD No: "
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="20dp"
+            android:textColor="@color/black"/>
+
+        <TextView
+            android:id="@+id/Resv_No"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Resv No: "
+            android:layout_below="@+id/DD_No"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="20dp"
+            android:textColor="@color/black"
+            android:layout_marginTop="3dp"/>
+
+        <TextView
+            android:id="@+id/Vehicle_No"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Vehicle No: "
+            android:layout_below="@+id/Resv_No"
+            android:layout_marginLeft="20dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="3dp"
+            android:textColor="@color/black"/>
+
+        <TextView
+            android:id="@+id/Route_Name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Route Name: "
+            android:layout_marginTop="3dp"
+            android:layout_below="@+id/Vehicle_No"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="20dp"
+            android:textColor="@color/black"/>
+
+        <TextView
+            android:id="@+id/Status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Status: "
+            android:layout_below="@+id/Route_Name"
+            android:layout_marginTop="3dp"
+            android:layout_marginLeft="20dp"
+            android:layout_alignParentLeft="true"
+            android:textColor="@color/black"/>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

@@ -3,10 +3,6 @@ package com.example.vitaran
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
-
-
-
-
 class ReportResponseData {
     @SerializedName("status")
     @Expose

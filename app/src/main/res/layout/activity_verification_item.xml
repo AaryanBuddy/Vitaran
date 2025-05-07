@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@color/white"
+    android:padding="8dp"
+    android:layout_margin="20dp"
+    android:elevation="2dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:background="@drawable/material_gradient"
+        android:padding="8dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/qtyLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="QTY: "
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/uomLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="UoM: EA"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:padding="8dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/matCode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MAT Code: "
+            android:textColor="#0096C7"
+            android:textStyle="bold"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/matDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MAT Desc:"
+            android:textStyle="bold"
+            android:textColor="#0096C7"
+            android:textSize="14sp" />
+    </LinearLayout>
+</LinearLayout>

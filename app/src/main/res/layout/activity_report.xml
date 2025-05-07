@@ -5,7 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ReportActivity">
+    tools:context=".ReportActivity"
+    android:background="@color/white">
 
     <RelativeLayout
         android:id="@+id/ReportHeader"

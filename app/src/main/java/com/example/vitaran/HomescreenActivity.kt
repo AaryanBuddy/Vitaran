@@ -33,6 +33,7 @@ class HomescreenActivity : AppCompatActivity() {
         if (loadingDialog == null){
             loadingDialog = Dialog(this).apply {
                 setContentView(R.layout.dialog_loading)
+                window?.setBackgroundDrawableResource(android.R.color.transparent)
                 setCancelable(false)
             }
         }
@@ -109,6 +110,7 @@ class HomescreenActivity : AppCompatActivity() {
                 if (response.isSuccessful && response.body() != null) {
                     hideLoading()
                     val responseData = response.body()!!
+
                     val count = responseData.data?.size
                     if(count != null) {
                         totalCount?.text = "Total Count: $count"

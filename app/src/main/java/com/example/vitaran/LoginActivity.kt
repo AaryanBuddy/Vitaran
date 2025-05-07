@@ -29,6 +29,7 @@ class LoginActivity : AppCompatActivity(){
         if (loadingDialog == null){
             loadingDialog = Dialog(this).apply {
                 setContentView(R.layout.dialog_loading)
+                window?.setBackgroundDrawableResource(android.R.color.transparent)
                 setCancelable(false)
             }
         }

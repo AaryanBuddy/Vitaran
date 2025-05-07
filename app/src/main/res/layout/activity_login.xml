@@ -60,7 +60,7 @@
             android:padding="16dp"
             android:backgroundTint="@color/white"/>
 
-        <Button
+        <android.widget.Button
             android:id="@+id/submitButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -68,13 +68,15 @@
             android:layout_marginLeft="40dp"
             android:layout_marginRight="40dp"
             android:layout_below="@id/loginPass"
-            android:backgroundTint="@color/white"
             android:layout_centerHorizontal="true"
+            android:background="@drawable/rounded_button"
+            android:backgroundTint="@null"
             android:text="Submit"
             android:textStyle="bold"
             android:textSize="20sp"
             android:textColor="@color/tata_blue"
-            android:elevation="20dp"/>
+            android:elevation="20dp" />
+
 
 
     </RelativeLayout>

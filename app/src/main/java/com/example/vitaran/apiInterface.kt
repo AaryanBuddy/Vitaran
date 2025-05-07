@@ -16,4 +16,10 @@ interface apiInterface {
     @POST("Guard/GuardActionHistory")
     fun route(@Body reportRequest: ReportRequest): Call<RouteResponse>
 
+    @POST("Guard/GetDD_revision")
+    fun routes(@Body routeRequest: RouteRequest): Call<RoutesResponse>
+
+    @POST("Guard/DD_revisionDeatils")
+    fun verification(@Body verificationRequest: VerificationRequest): Call<VerificationResponse>
+
 }

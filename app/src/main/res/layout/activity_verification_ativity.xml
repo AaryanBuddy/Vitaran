@@ -76,11 +76,11 @@
         tools:listitem="@layout/activity_verification_item"/>
 
     <LinearLayout
+        android:id="@+id/RadioGroupLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="120dp">
+        android:layout_above="@+id/varifyLayout">
 
         <RadioGroup
             android:id="@+id/radioGroup"
@@ -118,6 +118,39 @@
         </RadioGroup>
 
     </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/varifyLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:padding="10dp"
+        android:layout_above="@+id/submitButton">
+
+        <TextView
+            android:layout_marginLeft="20dp"
+            android:id="@+id/FullName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Name"/>
+        <TextView
+            android:layout_marginLeft="20dp"
+            android:id="@+id/remarks"
+            android:layout_below="@+id/FullName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Remark"/>
+        <ImageView
+            android:layout_alignTop="@+id/FullName"
+            android:id="@+id/imgView"
+            android:layout_toEndOf="@+id/FullName"
+            android:layout_marginLeft="20dp"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            />
+
+    </RelativeLayout>
 
     <android.widget.Button
         android:id="@+id/submitButton"

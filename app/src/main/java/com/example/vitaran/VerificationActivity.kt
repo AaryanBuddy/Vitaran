@@ -1,22 +1,33 @@
 package com.example.vitaran
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.text.Layout
 import android.util.Log
+import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.BitmapCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Call
+import java.io.File
 
 class VerificationActivity : AppCompatActivity() {
 
@@ -31,6 +42,34 @@ class VerificationActivity : AppCompatActivity() {
     var resv: String? = null
     var radioGroup: RadioGroup? = null
     var submit: Button? = null
+    var nameTextView: TextView? = null
+    var remarkEditText: TextView? = null
+    var signImage: ImageView? = null
+    var varifyLayout: RelativeLayout?= null
+    var btnYes: Button? = null
+    private var confirmationDialog: AlertDialog? = null
+
+
+    private val signatureActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){result: ActivityResult ->
+        if (result.resultCode == RESULT_OK) {
+            val data = result.data
+            val name = data?.getStringExtra("name_key")
+            val remark = data?.getStringExtra("remark_key")
+            val signaturePath = data?.getStringExtra("signature_key")
+
+            nameTextView?.text = "Name: ${name}"
+            remarkEditText?.setText("Remark: ${remark}")
+
+            signaturePath?.let {
+                val file = File(it)
+                if (file.exists()) {
+                    val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                    signImage?.setImageBitmap(bitmap)
+                }
+            }
+            varifyLayout?.visibility = View.VISIBLE
+        }
+    }
     
 
     @SuppressLint("ResourseType")
@@ -49,6 +88,7 @@ class VerificationActivity : AppCompatActivity() {
         loadingDialog?.dismiss()
     }
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -63,6 +103,19 @@ class VerificationActivity : AppCompatActivity() {
         matDocNumber = intent.getStringExtra("matDocNo")
         routeNumber = intent.getStringExtra("routeNo")
         radioGroup = findViewById(R.id.radioGroup)
+        nameTextView=findViewById(R.id.FullName)
+        remarkEditText=findViewById(R.id.remarks)
+        signImage=findViewById(R.id.imgView)
+        varifyLayout=findViewById(R.id.varifyLayout)
+        btnYes=findViewById(R.id.btnYes)
+
+        varifyLayout?.visibility= View.GONE
+
+        dd = intent.getStringExtra("ddNo")
+        resv = intent.getStringExtra("revNo")
+        matDocNumber = intent.getStringExtra("matDocNo")
+        routeNumber = intent.getStringExtra("routeNo")
+
 
         radioGroup?.setOnCheckedChangeListener { group, checkedId ->
             val selectedRadioButton = group.findViewById<RadioButton>(checkedId)
@@ -77,46 +130,28 @@ class VerificationActivity : AppCompatActivity() {
             title.text = "वितरण"
             message.text = "Are you sure you want to select ${selectedText}?"
 
-            val alertDialog = AlertDialog.Builder(this)
+            confirmationDialog = AlertDialog.Builder(this)
                 .setView(dialogView)
                 .setCancelable(false)
                 .create()
 
             btnYes.setOnClickListener {
-                alertDialog.dismiss()
-                val intent = Intent(this@VerificationActivity, HomescreenActivity::class.java)
-                startActivity(intent)
-                finish()
+                confirmationDialog?.dismiss()
+                confirmationDialog = null
+
+                val intent = Intent(this, SignatureActivity::class.java)
+                signatureActivityLauncher.launch(intent)
             }
 
             btnChange.setOnClickListener {
-                alertDialog.dismiss()
+                confirmationDialog?.dismiss()
+                confirmationDialog = null
             }
 
-            alertDialog.show()
+            confirmationDialog?.show()
         }
-
-
 
         showData()
-    }
-
-    fun confirmation(){
-
-        val confirmDialog = AlertDialog.Builder(this)
-        confirmDialog.setTitle("वितरण")
-        confirmDialog.setMessage("Are you Sure?")
-        confirmDialog.setCancelable(false)
-
-        confirmDialog.setPositiveButton("Yes"){_, _ ->
-            val intent = Intent(this@VerificationActivity, HomescreenActivity::class.java)
-            finish()
-        }
-
-        confirmDialog.setNegativeButton("Cancel"){_, _ ->
-
-        }
-
     }
 
     fun showData(){
@@ -125,6 +160,7 @@ class VerificationActivity : AppCompatActivity() {
         val sharedPreferences = getSharedPreferences("userPref", MODE_PRIVATE)
         val savedUsername = sharedPreferences.getString("Username", null)
         val savedToken = sharedPreferences.getString("Token", null)
+
 
         var verificationRequest = VerificationRequest(
             DD_Number = dd.toString(),

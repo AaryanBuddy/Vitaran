@@ -8,16 +8,28 @@ import androidx.appcompat.view.menu.MenuView.ItemView
 import androidx.recyclerview.widget.RecyclerView
 import org.w3c.dom.Text
 
-class VerificationAdapter(private val verificationDataList: List<VerificationDataList>) : RecyclerView.Adapter<VerificationAdapter.VerificationViewHolder>() {
+class VerificationAdapter(
+    private val verificationDataList: List<VerificationDataList>,
+    private val itemClickListener: (VerificationDataList) -> Unit
+) : RecyclerView.Adapter<VerificationAdapter.VerificationViewHolder>() {
 
     inner class VerificationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val qty: TextView = itemView.findViewById(R.id.qtyLabel)
         val uom: TextView = itemView.findViewById(R.id.uomLabel)
         val matCode: TextView = itemView.findViewById(R.id.matCode)
         val matDesp: TextView = itemView.findViewById(R.id.matDesc)
+
+        init {
+            itemView.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    itemClickListener(verificationDataList[position])
+                }
+            }
+        }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VerificationAdapter.VerificationViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VerificationViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.activity_verification_item, parent, false)
         return VerificationViewHolder(view)
     }

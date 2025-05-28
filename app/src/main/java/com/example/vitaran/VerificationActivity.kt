@@ -28,6 +28,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Call
 import java.io.File
+import kotlin.jvm.java
 
 class VerificationActivity : AppCompatActivity() {
 
@@ -48,6 +49,11 @@ class VerificationActivity : AppCompatActivity() {
     var varifyLayout: RelativeLayout?= null
     var btnYes: Button? = null
     private var confirmationDialog: AlertDialog? = null
+    private var signatureBase64: String? = null
+    private var signatureFileName: String? = null
+    var verifyStatus: String? = null
+    var addtionalInfo: String? = null
+
 
 
     private val signatureActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){result: ActivityResult ->
@@ -56,6 +62,8 @@ class VerificationActivity : AppCompatActivity() {
             val name = data?.getStringExtra("name_key")
             val remark = data?.getStringExtra("remark_key")
             val signaturePath = data?.getStringExtra("signature_key")
+            signatureBase64 = data?.getStringExtra("signature_base64")
+            signatureFileName = data?.getStringExtra("signature_filename")
 
             nameTextView?.text = "Name: ${name}"
             remarkEditText?.setText("Remark: ${remark}")
@@ -68,9 +76,10 @@ class VerificationActivity : AppCompatActivity() {
                 }
             }
             varifyLayout?.visibility = View.VISIBLE
+            submit?.isEnabled = true
         }
     }
-    
+
 
     @SuppressLint("ResourseType")
     private fun showLoading() {
@@ -108,6 +117,7 @@ class VerificationActivity : AppCompatActivity() {
         signImage=findViewById(R.id.imgView)
         varifyLayout=findViewById(R.id.varifyLayout)
         btnYes=findViewById(R.id.btnYes)
+        submit=findViewById(R.id.submitButton)
 
         varifyLayout?.visibility= View.GONE
 
@@ -139,6 +149,12 @@ class VerificationActivity : AppCompatActivity() {
                 confirmationDialog?.dismiss()
                 confirmationDialog = null
 
+                verifyStatus = if (selectedRadioButton.text.toString().equals("Verified", ignoreCase = true)) {
+                    "V"
+                } else {
+                    "R"
+                }
+
                 val intent = Intent(this, SignatureActivity::class.java)
                 signatureActivityLauncher.launch(intent)
             }
@@ -151,18 +167,28 @@ class VerificationActivity : AppCompatActivity() {
             confirmationDialog?.show()
         }
 
+        submit?.isEnabled = false
+
+        submit?.setOnClickListener {
+            val verify = verifyStatus
+            if (verify == null) {
+                Toast.makeText(this, "Please select Verified or Reject", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            submitSignature()
+        }
+
         showData()
     }
 
-    fun showData(){
+    fun showData() {
         showLoading()
 
         val sharedPreferences = getSharedPreferences("userPref", MODE_PRIVATE)
         val savedUsername = sharedPreferences.getString("Username", null)
         val savedToken = sharedPreferences.getString("Token", null)
 
-
-        var verificationRequest = VerificationRequest(
+        val verificationRequest = VerificationRequest(
             DD_Number = dd.toString(),
             Mat_Doc_No = matDocNumber.toString(),
             Reservation_No = resv.toString(),
@@ -170,43 +196,111 @@ class VerificationActivity : AppCompatActivity() {
             username = savedUsername.toString()
         )
 
-        var api = RetrofitInstance
+        val api = RetrofitInstance
             .getAuthRetrofit(savedToken.toString(), savedUsername.toString())
             .create(apiInterface::class.java)
 
-        var call = api.verification(verificationRequest)
+        val call = api.verification(verificationRequest)
 
-        call.enqueue(object : Callback<VerificationResponse>{
+        call.enqueue(object : Callback<VerificationResponse> {
             override fun onResponse(call: Call<VerificationResponse>, response: Response<VerificationResponse>) {
-                if (response.isSuccessful && response.body() != null){
-                    hideLoading()
+                hideLoading()
+                if (response.isSuccessful && response.body() != null) {
                     val responseData = response.body()!!
                     val count = responseData.data?.size
-                    if (count != null){
+                    if (count != null) {
                         ddNumber?.text = "DD No: $dd"
                         resvNumber?.text = "Resv No: $resv"
                         totalCount?.text = "Total Count: $count"
-                        responseData.data?.let {
-                            val adapter = VerificationAdapter(it)
+                        responseData.data?.let { dataList ->
+                            val adapter = VerificationAdapter(dataList) { selectedItem ->
+                                addtionalInfo = selectedItem.Additional_Info
+                            }
                             recyclerView.adapter = adapter
                         }
+                    } else {
+                        totalCount?.text = "Total Count: 0"
                     }
-                    else{
-                        totalCount?.text="Total Count: 0"
-                    }
-                }
-                else{
-                    hideLoading()
+                } else {
                     Toast.makeText(applicationContext, "API not hit: ${response.code()}", Toast.LENGTH_SHORT).show()
                     Log.e("API_ERROR", "Error body: ${response.errorBody()?.string()}")
                 }
             }
 
-            override fun onFailure(call: retrofit2.Call<VerificationResponse>, t: Throwable) {
+            override fun onFailure(call: Call<VerificationResponse>, t: Throwable) {
                 hideLoading()
                 Toast.makeText(this@VerificationActivity, "Failed: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+
+    fun submitSignature(){
+        showLoading()
+
+        val sharedPreferences = getSharedPreferences("userPref", MODE_PRIVATE)
+        val savedUsername = sharedPreferences.getString("Username", null)
+        val savedToken = sharedPreferences.getString("Token", null)
+
+        val imageList = listOf(
+            SignatureImages(
+                ImageName = signatureFileName ?: "signature.png",
+                ImageType = "PNG",
+                base64 = signatureBase64.toString()
+            )
+        )
+
+        val signatureRequest = SignatureRequest(
+            AdditionalInfo_guard = addtionalInfo ?: "",
+            DD_Number = dd.toString(),
+            ImagesList = imageList,
+            Lat = "23.456",
+            Lon = "78.123",
+            Mat_Doc_No = matDocNumber.toString(),
+            PhotoList = imageList,
+            Remarks = remarkEditText?.text?.toString() ?: "",
+            Reservation_No = resv ?: "",
+            Verify = verifyStatus!!,
+            VerifybyName = nameTextView?.text?.toString() ?: "",
+            routeno = routeNumber.toString(),
+            username = savedUsername.toString()
+        )
+
+        val api = RetrofitInstance
+            .getAuthRetrofit(savedToken.toString(), savedUsername.toString())
+            .create(apiInterface::class.java)
+
+        val call = api.signature(signatureRequest)
+
+        call.enqueue(object : Callback<SignatureResponse> {
+            override fun onResponse(
+                call: Call<SignatureResponse>,
+                response: Response<SignatureResponse>
+            ) {
+                if (response.isSuccessful) {
+                    hideLoading()
+                    val responseData = response.body()!!
+                    Toast.makeText(applicationContext, "Signature submitted successfully!", Toast.LENGTH_SHORT).show()
+                    Log.d("SIGNATURE_RESPONSE", "Success: ${responseData.message}")
+                    val intent = Intent(this@VerificationActivity, HomescreenActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                    finish()
+                } else {
+                    hideLoading()
+                    Toast.makeText(applicationContext, "Submission failed: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    Log.e("SIGNATURE_ERROR", "Error: ${response.errorBody()?.string()}")
+                }
+            }
+
+            override fun onFailure(call: Call<SignatureResponse>, t: Throwable) {
+                hideLoading()
+                Toast.makeText(applicationContext, "Error: ${t.localizedMessage}", Toast.LENGTH_SHORT).show()
+                Log.e("SIGNATURE_FAILURE", "Throwable", t)
+            }
+        })
+
+
     }
 
 }

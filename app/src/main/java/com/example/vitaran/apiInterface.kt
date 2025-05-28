@@ -22,4 +22,7 @@ interface apiInterface {
     @POST("Guard/DD_revisionDeatils")
     fun verification(@Body verificationRequest: VerificationRequest): Call<VerificationResponse>
 
+    @POST("Guard/Deatils_GuardPost")
+    fun signature(@Body signatureRequest: SignatureRequest): Call<SignatureResponse>
+
 }

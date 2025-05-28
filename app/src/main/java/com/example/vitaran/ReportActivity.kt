@@ -2,13 +2,8 @@ package com.example.vitaran
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import android.app.Dialog
-import android.content.Intent
-import android.media.tv.SectionResponse
 import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
@@ -17,7 +12,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 
 class ReportActivity : AppCompatActivity() {
 

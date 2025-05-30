@@ -4,8 +4,11 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.Layout
 import android.util.Log
 import android.view.View
@@ -21,6 +24,9 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.graphics.BitmapCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,7 +34,10 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Call
 import java.io.File
+import android.Manifest
+import android.graphics.Bitmap
 import kotlin.jvm.java
+
 
 class VerificationActivity : AppCompatActivity() {
 
@@ -53,8 +62,15 @@ class VerificationActivity : AppCompatActivity() {
     private var signatureFileName: String? = null
     var verifyStatus: String? = null
     var addtionalInfo: String? = null
+    var cameraIcon: ImageView? = null
+    var infoIcon: ImageView? = null
+    var camImage: ImageView? = null
+    private var imageUri: Uri? = null
+    private val REQUEST_IMAGE_CAPTURE = 1
+    private var cameraImageBase64: String? = null
 
 
+//  Launcher for getting the Data from Signature Activity
 
     private val signatureActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){result: ActivityResult ->
         if (result.resultCode == RESULT_OK) {
@@ -80,6 +96,7 @@ class VerificationActivity : AppCompatActivity() {
         }
     }
 
+//  Functions for the Loading Screen
 
     @SuppressLint("ResourseType")
     private fun showLoading() {
@@ -92,10 +109,10 @@ class VerificationActivity : AppCompatActivity() {
         }
         loadingDialog?.show()
     }
-
     private fun hideLoading() {
         loadingDialog?.dismiss()
     }
+
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -118,8 +135,20 @@ class VerificationActivity : AppCompatActivity() {
         varifyLayout=findViewById(R.id.varifyLayout)
         btnYes=findViewById(R.id.btnYes)
         submit=findViewById(R.id.submitButton)
+        cameraIcon=findViewById(R.id.cameraIcon)
+        infoIcon=findViewById(R.id.infoIcon)
+        camImage=findViewById(R.id.camImage)
 
         varifyLayout?.visibility= View.GONE
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE), 100)
+        }
+
+        cameraIcon?.setOnClickListener {
+            openCamera()
+        }
 
         dd = intent.getStringExtra("ddNo")
         resv = intent.getStringExtra("revNo")
@@ -250,6 +279,14 @@ class VerificationActivity : AppCompatActivity() {
             )
         )
 
+        val imageList2 = listOf(
+            CameraImages(
+                ImageName = "${System.currentTimeMillis()}.png",
+                ImageType = "PNG",
+                base64 = cameraImageBase64.toString()
+            )
+        )
+
         val signatureRequest = SignatureRequest(
             AdditionalInfo_guard = addtionalInfo ?: "",
             DD_Number = dd.toString(),
@@ -257,7 +294,7 @@ class VerificationActivity : AppCompatActivity() {
             Lat = "23.456",
             Lon = "78.123",
             Mat_Doc_No = matDocNumber.toString(),
-            PhotoList = imageList,
+            PhotoList = imageList2,
             Remarks = remarkEditText?.text?.toString() ?: "",
             Reservation_No = resv ?: "",
             Verify = verifyStatus!!,
@@ -302,5 +339,43 @@ class VerificationActivity : AppCompatActivity() {
 
 
     }
+
+    fun openCamera(){
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+
+        val imageFile = File(externalCacheDir, "${System.currentTimeMillis()}.jpg")
+        imageUri = FileProvider.getUriForFile(this, "${packageName}.provider", imageFile)
+
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+        startActivityForResult(cameraIntent, REQUEST_IMAGE_CAPTURE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            try {
+                imageUri?.let { uri ->
+                    val inputStream = contentResolver.openInputStream(uri)
+                    val bitmap = BitmapFactory.decodeStream(inputStream)
+                    inputStream?.close()
+
+                    // Convert bitmap to base64
+                    val outputStream = java.io.ByteArrayOutputStream()
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                    val byteArray = outputStream.toByteArray()
+                    cameraImageBase64 = android.util.Base64.encodeToString(byteArray, android.util.Base64.DEFAULT)
+
+
+                } ?: run {
+                    Toast.makeText(this, "Image URI is null", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(this, "Error loading image", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 
 }

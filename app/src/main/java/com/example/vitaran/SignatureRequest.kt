@@ -7,7 +7,7 @@ data class SignatureRequest(
     val Lat: String,
     val Lon: String,
     val Mat_Doc_No: String,
-    val PhotoList: List<SignatureImages>,
+    val PhotoList: List<CameraImages>,
     val Remarks: String,
     val Reservation_No: String,
     val Verify: String,

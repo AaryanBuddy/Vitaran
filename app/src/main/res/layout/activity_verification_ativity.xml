@@ -19,6 +19,23 @@
         android:padding="15dp"
         android:elevation="20dp">
 
+        <ImageView
+            android:id="@+id/cameraIcon"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginLeft="15dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/camera_icon"/>
+
+        <ImageView
+            android:id="@+id/infoIcon"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="15dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/info_icon"/>
+
         <TextView
             android:id="@+id/DD_No"
             android:layout_width="wrap_content"
@@ -151,6 +168,15 @@
             />
 
     </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/camImage"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="110dp"/>
 
     <android.widget.Button
         android:id="@+id/submitButton"

@@ -36,6 +36,8 @@ import retrofit2.Call
 import java.io.File
 import android.Manifest
 import android.graphics.Bitmap
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import kotlin.jvm.java
 
 
@@ -68,6 +70,12 @@ class VerificationActivity : AppCompatActivity() {
     private var imageUri: Uri? = null
     private val REQUEST_IMAGE_CAPTURE = 1
     private var cameraImageBase64: String? = null
+    private var latitude: Double? = null
+    private var longitude: Double? = null
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private val LOCATION_PERMISSION_REQUEST_CODE = 1001
+
+
 
 
 //  Launcher for getting the Data from Signature Activity
@@ -138,6 +146,10 @@ class VerificationActivity : AppCompatActivity() {
         cameraIcon=findViewById(R.id.cameraIcon)
         infoIcon=findViewById(R.id.infoIcon)
         camImage=findViewById(R.id.camImage)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        requestLocationPermission()
+
 
         varifyLayout?.visibility= View.GONE
 
@@ -145,6 +157,7 @@ class VerificationActivity : AppCompatActivity() {
             ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE), 100)
         }
+
 
         cameraIcon?.setOnClickListener {
             openCamera()
@@ -208,6 +221,8 @@ class VerificationActivity : AppCompatActivity() {
         }
 
         showData()
+
+
     }
 
     fun showData() {
@@ -291,8 +306,8 @@ class VerificationActivity : AppCompatActivity() {
             AdditionalInfo_guard = addtionalInfo ?: "",
             DD_Number = dd.toString(),
             ImagesList = imageList,
-            Lat = "23.456",
-            Lon = "78.123",
+            Lat = latitude?.toString() ?: "0.0",
+            Lon = longitude?.toString() ?: "0.0",
             Mat_Doc_No = matDocNumber.toString(),
             PhotoList = imageList2,
             Remarks = remarkEditText?.text?.toString() ?: "",
@@ -376,6 +391,63 @@ class VerificationActivity : AppCompatActivity() {
             }
         }
     }
+
+
+    private fun requestLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
+        } else {
+            getCurrentLocation()
+        }
+    }
+
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getCurrentLocation()
+            } else {
+                Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun getCurrentLocation() {
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location ->
+                if (location != null) {
+                    val lat = location.latitude
+                    val lon = location.longitude
+                } else {
+                    Toast.makeText(this, "Location is null", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+
 
 
 }
